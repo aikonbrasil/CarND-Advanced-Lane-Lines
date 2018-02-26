@@ -63,7 +63,7 @@ In the next Figure is easily to check the calibration effect on the chessboard i
 To demonstrate this step, I used the arrays `imgpoints` and `objpoints` obtained in the Camera Calibration step. I also reuse the function `cal_undistort`. This step could be identified in between lines 78 and 87 in the file called `main.py`. The result of one of the test images looks like this one:
 ![alt text][image1_undistort]
 
-Specifically focusing in the edge, in which the effect of the distortion is more evident. 
+Specifically focusing on the image edge, in which the effect of the distortion is more evident. 
 ![alt text][image2_undistort]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
