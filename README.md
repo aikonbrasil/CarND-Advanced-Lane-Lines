@@ -17,8 +17,9 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./output_images/calibration_result_1.png "Undistorted_1"
-[image2]: ./output_images/calibration_result_2.png "Undistorted_1"
+[image1_distort]: ./output_images/calibration_result_1.png "Undistorted_1"
+[image2_distort]: ./output_images/calibration_result_2.png "Undistorted_1"
+[image2]: ./examples/test1.jpg "Road Transformed"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
@@ -47,11 +48,11 @@ I star by defining the number of corners of calibration images, in this case nx=
 
 I then created and used the function `cal_undistort` that is based on `cv2.calibrateCamera()` and `cv2.undistort() ` functions.  I applied this distortion correction to the test image and obtained this result:
 
-![alt text][image1]
+![alt text][image1_distort]
 
-In the next Figure is easily to check the calibration effect of the chessboard image.
+In the next Figure is easily to check the calibration effect on the chessboard image.
 
-![alt text][image2]
+![alt text][image2_distort]
 
 ### Pipeline (single images)
 
