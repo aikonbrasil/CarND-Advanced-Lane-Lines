@@ -22,6 +22,13 @@ The goals / steps of this project are the following:
 [image1_undistort]: ./output_images/distortion_corrected_0.png "Test Distortion Corrected 1"
 [image2_undistort]: ./output_images/distortion_corrected_1.png "Test Distortion Corrected 2"
 [image1_threshold]: ./output_images/gradient_threshold_0.png "Threshold result"
+[image1_warped]: ./output_images/wraped_0.png "Warped 1"
+[image2_warped]: ./output_images/wraped_1.png "Warped 2"
+[image3_warped]: ./output_images/wraped_2.png "Warped 3"
+[image4_warped]: ./output_images/wraped_3.png "Warped 4"
+[image5_warped]: ./output_images/wraped_4.png "Warped 5"
+[image6_warped]: ./output_images/wraped_5.png "Warped 6"
+[image7_warped]: ./output_images/wraped_6.png "Warped 7"
 [image2]: ./test_images/test1.jpg "Road Transformed"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
@@ -77,33 +84,26 @@ In the following image is easily to distinguish three differente images, the fir
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
-
-```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
-```
+The code for my perspective transform includes a function called `corners_warper()`, which appears in lines 176 through 215 in the file `main.py` (output_images/examples/example.py).  The `corners_warper()` function takes as inputs an image (`img1`), as well as Object_Points(`objpoints`), Image_points (`imgpoints`), source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   |
 |:-------------:|:-------------:|
-| 585, 460      | 320, 0        |
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 587, 452      | 465, 0        |
+| 691, 452      | 920, 0      |
+| 200, 718     | 465, 700      |
+| 1120, 718      | 920, 700        |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image. It was tested in all test images provided in the `test_images` folder
 
-![alt text][image4]
+![alt text][image1_warped]
+![alt text][image2_warped]
+![alt text][image3_warped]
+![alt text][image4_warped]
+![alt text][image5_warped]
+![alt text][image6_warped]
+![alt text][image7_warped]
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
