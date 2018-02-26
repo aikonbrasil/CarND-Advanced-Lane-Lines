@@ -15,7 +15,7 @@ def cal_undistort(img, objpoints, imgpoints):
     return undist
 
 ###############################################################################
-flag_plot = False
+flag_plot = True
 ###############################################################################
 # CAMERA CALIBRATION - script
 ##############################################################################
@@ -191,20 +191,25 @@ point_2 = [200,718]
 point_3 = [1120,718]
 src = np.float32([point_0,point_1,point_2,point_3])
 dst = np.float32([[465,0],[920,0],[465,700],[920,700]])
-img = mpimg.imread('test_images/straight_lines1.jpg')
-undistorted = cal_undistort(img, objpoints, imgpoints)
-cv2.line(undistorted, tuple(point_2), tuple(point_0), color=[255,0,0], thickness=2)
-cv2.line(undistorted, tuple(point_0), tuple(point_1), color=[255,0,0], thickness=2)
-cv2.line(undistorted, tuple(point_1), tuple(point_3), color=[255,0,0], thickness=2)
-#plt.imshow(image)
-#plt.show()
-top_down, perspective_M = corners_unwarp(undistorted, objpoints, imgpoints, src, dst)
-if flag_plot == True:
-    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
-    f.tight_layout()
-    ax1.imshow(undistorted)
-    ax1.set_title('Original Image', fontsize=50)
-    ax2.imshow(top_down)
-    ax2.set_title('Undistorted and Warped Image', fontsize=50)
-    plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
-    plt.show()
+images = glob.glob('test_images/*.jpg')
+for frame in images:
+    img = mpimg.imread(frame)
+#img = mpimg.imread('test_images/straight_lines1.jpg')
+    undistorted = cal_undistort(img, objpoints, imgpoints)
+    cv2.line(undistorted, tuple(point_2), tuple(point_0), color=[255,0,0], thickness=2)
+    cv2.line(undistorted, tuple(point_0), tuple(point_1), color=[255,0,0], thickness=1)
+    cv2.line(undistorted, tuple(point_1), tuple(point_3), color=[255,0,0], thickness=2)
+    cv2.line(undistorted, tuple(point_2), tuple(point_3), color=[255,0,0], thickness=2)
+    #plt.imshow(image)
+    #plt.show()
+    top_down, perspective_M = corners_unwarp(undistorted, objpoints, imgpoints, src, dst)
+    flag_plot = True
+    if flag_plot == True:
+        f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
+        f.tight_layout()
+        ax1.imshow(undistorted)
+        ax1.set_title('Undistorted Image', fontsize=30)
+        ax2.imshow(top_down)
+        ax2.set_title('Warped Image - bird´s eye view', fontsize=30)
+        plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
+        plt.show()

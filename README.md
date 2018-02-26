@@ -21,6 +21,7 @@ The goals / steps of this project are the following:
 [image2_distort]: ./output_images/calibration_result_2.png "Undistorted_1"
 [image1_undistort]: ./output_images/distortion_corrected_0.png "Test Distortion Corrected 1"
 [image2_undistort]: ./output_images/distortion_corrected_1.png "Test Distortion Corrected 2"
+[image1_threshold]: ./output_images/gradient_threshold_0.png "Threshold result"
 [image2]: ./test_images/test1.jpg "Road Transformed"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
@@ -63,14 +64,16 @@ In the next Figure is easily to check the calibration effect on the chessboard i
 To demonstrate this step, I used the arrays `imgpoints` and `objpoints` obtained in the Camera Calibration step. I also reuse the function `cal_undistort`. This step could be identified in between lines 78 and 87 in the file called `main.py`. The result of one of the test images looks like this one:
 ![alt text][image1_undistort]
 
-Specifically focusing on the image edge, in which the effect of the distortion is more evident. 
+Specifically focusing on the image edge, in which the effect of the distortion is more evident.
 ![alt text][image2_undistort]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used created some binaries images based Sobel X gradient , Sobel Y gradient , Magnitude gradient, Gradient direction (using the `arctan2` function), Threshold color on S Channel from HLS color space (Channel L and S used in this case), and combinations of the techniques described before. After try many combinations, the best choose was the combined binary of Threshold channel S color binary + Sobel X gradient binary. The code used to apply the threshold techniques could be localized since the line 96 until 168 in `main.py`.
 
-![alt text][image3]
+In the following image is easily to distinguish three differente images, the first one is the original figure that was previousbly undistorted, Over this image were applied the Threshold techniques. In the Color Binary is possible to identify the threshold contribution of three differente binary images (Red for Magnitude gradient, Sobel x gradient, and the S color space). The Binary result shows the final result of applying techniques described before.
+
+![alt text][image1_threshold]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
