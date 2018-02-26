@@ -6,16 +6,20 @@ import matplotlib.image as mpimg
 import glob
 
 ###############################################################################
-def cal_undistort(imgg, objpoints, imgpoints, nx, ny):
-    gray = cv2.cvtColor(imgg,cv2.COLOR_BGR2GRAY)
+def cal_undistort(img, objpoints, imgpoints, nx, ny):
+    img1 = np.copy(img)
+    gray = cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
     ret, corners = cv2.findChessboardCorners(gray, (nx,ny), None)
-    imgg = cv2.drawChessboardCorners(imgg, (nx,ny), corners, ret)
+    img1 = cv2.drawChessboardCorners(img1, (nx,ny), corners, ret)
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-    undist = cv2.undistort(imgg, mtx, dist, None, mtx)
+    undist = cv2.undistort(img1, mtx, dist, None, mtx)
     return undist
 
 ###############################################################################
 
+###############################################################################
+# Camera Calibration script
+##############################################################################
 # Prepare object points
 nx = 9 # Number of inside corners in x
 ny = 6 # Number of inside corners in y
@@ -54,7 +58,7 @@ for fname in images:
         #plt.imshow(img_corners_detected)
         #plt.show()
 
-imggg = cv2.imread('camera_cal/calibration1.jpg')
+imggg = cv2.imread('camera_cal/calibration5.jpg')
 undistorted = cal_undistort(imggg, objpoints, imgpoints, nx, ny)
 
 f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
