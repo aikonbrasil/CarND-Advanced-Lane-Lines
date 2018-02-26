@@ -19,6 +19,8 @@ The goals / steps of this project are the following:
 
 [image1_distort]: ./output_images/calibration_result_1.png "Undistorted_1"
 [image2_distort]: ./output_images/calibration_result_2.png "Undistorted_1"
+[image1_undistort]: ./output_images/distortion_corrected_0.png "Test Distortion Corrected 1"
+[image2_undistort]: ./output_images/distortion_corrected_1.png "Test Distortion Corrected 2"
 [image2]: ./test_images/test1.jpg "Road Transformed"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
@@ -58,8 +60,11 @@ In the next Figure is easily to check the calibration effect on the chessboard i
 
 #### 1. Provide an example of a distortion-corrected image.
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][image2]
+To demonstrate this step, I used the arrays `imgpoints` and `objpoints` obtained in the Camera Calibration step. I also reuse the function `cal_undistort`. This step could be identified in between lines 78 and 87 in the file called `main.py`. The result of one of the test images looks like this one:
+![alt text][image1_undistort]
+
+Specifically focusing in the edge, in which the effect of the distortion is more evident. 
+![alt text][image2_undistort]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
