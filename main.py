@@ -173,44 +173,24 @@ if flag_plot == True:
 # you performed a perspective transform and provide an example of a transformed
 # image.
 ###############################################################################
-def corners_unwarp(img1, objpoints, imgpoints):
-    #img1 = np.copy(img)
-    # Pass in your image into this function
-    # Write code to do the following steps
-    # 1) Undistort using mtx and dist
+def corners_unwarp(img1, objpoints, imgpoints, src, dst):
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
     undist = cv2.undistort(img1, mtx, dist, None, mtx)
-    # 2) Convert to grayscale
-    #gray = cv2.cvtColor(undist, cv2.COLOR_BGR2GRAY)
-    # 3) Find the chessboard corners
-    #ret, corners = cv2.findChessboardCorners(gray, (nx, ny), None)
-    # 4) If corners found:
-    ret = True
-    if ret == True:
-        # a) draw corners
-        #cv2.drawChessboardCorners(undist, (nx, ny), corners, ret)
-        # b) define 4 source points src = np.float32([[,],[,],[,],[,]])
-        point_0 = [587,452]
-        point_1 = [691,452]
-        point_2 = [200,720]
-        point_3 = [1120,720]
-        src = np.float32([point_0,point_1,point_2,point_3])
-        # c) define 4 destination points dst = np.float32([[,],[,],[,],[,]])
-        #dst = np.float32([[465,400],[920,400],[465,570],[920,570]])
-        dst = np.float32([[465,0],[920,0],[465,700],[920,700]])
-        # d) use cv2.getPerspectiveTransform() to get M, the transform matrix
-        M = cv2.getPerspectiveTransform(src, dst)
+    M = cv2.getPerspectiveTransform(src, dst)
         # e) use cv2.warpPerspective() to warp your image to a top-down view
-        img_size = gray.shape[::-1]
-        warped = cv2.warpPerspective(undist, M, img_size, flags=cv2.INTER_LINEAR)
+    img_size = gray.shape[::-1]
+    warped = cv2.warpPerspective(undist, M, img_size, flags=cv2.INTER_LINEAR)
     #delete the next two lines
     #M = None
     #warped = np.copy(img1)
     return warped, M
+
 point_0 = [587,452]
 point_1 = [691,452]
 point_2 = [200,718]
 point_3 = [1120,718]
+src = np.float32([point_0,point_1,point_2,point_3])
+dst = np.float32([[465,0],[920,0],[465,700],[920,700]])
 img = mpimg.imread('test_images/straight_lines1.jpg')
 undistorted = cal_undistort(img, objpoints, imgpoints)
 cv2.line(undistorted, tuple(point_2), tuple(point_0), color=[255,0,0], thickness=2)
@@ -218,12 +198,13 @@ cv2.line(undistorted, tuple(point_0), tuple(point_1), color=[255,0,0], thickness
 cv2.line(undistorted, tuple(point_1), tuple(point_3), color=[255,0,0], thickness=2)
 #plt.imshow(image)
 #plt.show()
-top_down, perspective_M = corners_unwarp(undistorted, objpoints, imgpoints)
-f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
-f.tight_layout()
-ax1.imshow(undistorted)
-ax1.set_title('Original Image', fontsize=50)
-ax2.imshow(top_down)
-ax2.set_title('Undistorted and Warped Image', fontsize=50)
-plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
-plt.show()
+top_down, perspective_M = corners_unwarp(undistorted, objpoints, imgpoints, src, dst)
+if flag_plot == True:
+    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
+    f.tight_layout()
+    ax1.imshow(undistorted)
+    ax1.set_title('Original Image', fontsize=50)
+    ax2.imshow(top_down)
+    ax2.set_title('Undistorted and Warped Image', fontsize=50)
+    plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
+    plt.show()
