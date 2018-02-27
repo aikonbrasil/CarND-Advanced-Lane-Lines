@@ -219,30 +219,6 @@ for frame in images:
 # PIPELINE (lane line pixels) Describe how (and identify where in your code) you
 # identified lane-line pixels and fit their positions with a polynomial?
 ###############################################################################
-def region_of_interest(img, vertices):
-    """
-    Applies an image mask.
-
-    Only keeps the region of the image defined by the polygon
-    formed from `vertices`. The rest of the image is set to black.
-    """
-    #defining a blank mask to start with
-    mask = np.zeros_like(img)
-
-    #defining a 3 channel or 1 channel color to fill the mask with depending on the input image
-    if len(img.shape) > 2:
-        channel_count = img.shape[2]  # i.e. 3 or 4 depending on your image
-        ignore_mask_color = (255,) * channel_count
-    else:
-        ignore_mask_color = 255
-
-    #filling pixels inside the polygon defined by "vertices" with the fill color
-    cv2.fillPoly(mask, vertices, ignore_mask_color)
-
-    #returning the image only where mask pixels are nonzero
-    masked_image = cv2.bitwise_and(img, mask)
-    return masked_image
-
 def list_of_peaks(hist, maxrange):
     #Convert histogram to simple list
     #hist = [val[0] for val in hist];
@@ -255,32 +231,30 @@ def list_of_peaks(hist, maxrange):
 
     #Index of highest peak in histogram
     # Peaks over a threshold
+    grupos_index = [] # 3D points in real world space
+    grupos_valor = [] # 2D points in image plane
     index_of_highest_peak = s[0][0]
-    for ii in range(0,maxrange):
-        if (s[ii][1] > 100) & (index_of_highest_peak - s[ii][0] > 20):
-            print('pontos com maior pico')
-            print(s[ii][0])
-    index_of_highest_peak = s[0][0]
-    counter=0
-    diferencia = 0
-    #while diferencia < 100:
-    #    counter = counter +1
-    #    diferencia = s[0][1] - s[counter][1]
-    #    print(diferencia)
-
-
-    #Index of second highest peak in histogram
-    #index_of_second_highest_peak = s[1][0];
-    index_of_second_highest_peak = s[counter][0]
     #print(s)
+    index_of_highest_peak = s[0][0]
+    # Loop of the first 20 samples of list of peaks
+    for ii in range(0,20):
+        gradiente = s[ii][0] - s[ii+1][0]
+        #print(gradiente)
+        if gradiente < -100:
+            #print("Segundo Pico potencial util")
+            #print(s[ii+1][0])
+            index_of_highest_peak = s[ii+1][0]
+            break
 
-    return index_of_highest_peak, index_of_second_highest_peak
+    #index_of_second_highest_peak = s[1][0]
+    #print(s)
+    #print("PICO MAIOR no indice")
+    #print(index_of_highest_peak)
+    return index_of_highest_peak
 
 def findng_lines(binary_warped):
     # Take a histogram of the bottom half of the image
     histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
-    plt.plot(histogram)
-    plt.show()
     # Create an output image to draw on and  visualize the result
     out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
     # Find the peak of the left and right halves of the histogram
@@ -289,14 +263,13 @@ def findng_lines(binary_warped):
     leftx_base = np.argmax(histogram[:midpoint])
     rightx_base = np.argmax(histogram[midpoint:]) + midpoint
 
-    print('Pico raw izquerda')
-    print(leftx_base)
+    #print('Pico raw izquerda')
+    #print(leftx_base)
 
-    peak_1, peak_2 = list_of_peaks(histogram[:midpoint],midpoint)
-    print('1er pico:')
-    print(peak_1)
-    print('2nd pico:')
-    print(peak_2)
+    peak_1 = list_of_peaks(histogram[:midpoint],midpoint)
+    #print('1er pico elaborado:')
+    #print(peak_1)
+    leftx_base = peak_1
 
 
     # Choose the number of sliding windows
@@ -360,12 +333,31 @@ def findng_lines(binary_warped):
     left_fit = np.polyfit(lefty, leftx, 2)
     right_fit = np.polyfit(righty, rightx, 2)
 
-    return left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox
+    # Fit a second order polynomial in meters
+    ym_per_pix = 30/720 # meters per pixel in y dimension
+    xm_per_pix = 3.7/700 # meters per pixel in x dimension
+
+    # Fit new polynomials to x,y in world space
+    left_fit_cr = np.polyfit(lefty*ym_per_pix, leftx*xm_per_pix, 2)
+    right_fit_cr = np.polyfit(righty*ym_per_pix, rightx*xm_per_pix, 2)
+
+    # Calculate the new radii of curvature
+    y_eval = np.max(lefty)
+    y_evall = np.max(righty)
+    left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
+    right_curverad = ((1 + (2*right_fit_cr[0]*y_evall*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
+    # Now our radius of curvature is in meters
+    print('Left_line_curvature = ',left_curverad, 'm','   Right_line_curvature = ', right_curverad, 'm')
+
+
+    return left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox, histogram
 
 images = glob.glob('test_images/*.jpg')
 #images = glob.glob('test_images/test5.jpg')
 for frame in images:
+    print(frame)
     img = mpimg.imread(frame)
+    # for Video : input--> img    output --> result
     image = cal_undistort(img, objpoints, imgpoints)
 
     point_0 = [587,452]
@@ -373,36 +365,64 @@ for frame in images:
     point_2 = [200,718]
     point_3 = [1120,718]
 
-    #vertices = np.array([[(200-100,718),(587-50, 452), (691+50, 452), (1120+100,718)]], dtype=np.int32)
-    #masked_edges = region_of_interest(image, vertices)
-    #image = masked_edges
-    print(frame)
     #image = mpimg.imread('test_images/test1.jpg')
     # Applying Threshold
     result_mixcolor, result_binary  = pipeline(image, s_thresh=(170, 255), sx_thresh=(20, 100), d_thresh = (0.75, 1.3), mag_thresh=(58,110))
-    #result_mixcolor, result_binary  = pipeline(image, s_thresh=(150, 255), sx_thresh=(20, 90), d_thresh = (0.75, 1.3), mag_thresh=(58,110))
-    plt.imshow(result_binary,cmap='gray')
-    plt.show()
-    plt.imshow(result_mixcolor)
-    plt.show()
-    # Applying unwarp function
-    binary_warped, perspective_M = corners_unwarp(result_binary, objpoints, imgpoints, src, dst)
-    plt.imshow(binary_warped,cmap='gray')
-    plt.show()
-    # Applying sliding windows and Fit a Polynomial
-    left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox = findng_lines(binary_warped)
 
-    # ***********visualization
-    # Generate x and y values for plotting
+    binary_warped, perspective_M = corners_unwarp(result_binary, objpoints, imgpoints, src, dst)
+
+    left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox, histogram= findng_lines(binary_warped)
+
+    # Calculations of polynoms points
     ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
     left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
     right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
 
-    out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
-    out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
-    plt.imshow(out_img)
-    plt.plot(left_fitx, ploty, color='yellow')
-    plt.plot(right_fitx, ploty, color='yellow')
-    plt.xlim(0, 1280)
-    plt.ylim(720, 0)
-    plt.show()
+
+    # Preparing and format for undistort with detected green region
+    warped = binary_warped
+        # Create an image to draw the lines on
+    warp_zero = np.zeros_like(warped).astype(np.uint8)
+    color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
+
+    # Recast the x and y points into usable format for cv2.fillPoly()
+    pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
+    pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
+    pts = np.hstack((pts_left, pts_right))
+
+    # Draw the lane onto the warped blank image
+    cv2.fillPoly(color_warp, np.int_([pts]), (0,255, 0))
+    Minv = cv2.getPerspectiveTransform(dst, src) # Inverse transformation
+    # Warp the blank back to original image space using inverse perspective matrix (Minv)
+    newwarp = cv2.warpPerspective(color_warp, Minv, (image.shape[1], image.shape[0]))
+    # Combine the result with the original image
+    undist = image
+    result = cv2.addWeighted(undist, 1, newwarp, 0.3, 0)
+
+    # ***********visualization
+    # Generate x and y values for plotting
+    if flag_plot == True:
+        out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
+        out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
+
+        f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(10, 5))
+        f.tight_layout()
+
+        ax1.imshow(result_binary,cmap='gray')
+        ax1.set_title('Binary Image', fontsize=20)
+
+        #ax2.imshow(binary_warped,cmap='gray')
+        #ax2.set_title('Binary Warped Result', fontsize=20)
+        #plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
+
+        ax2.imshow(out_img)
+        ax2.plot(left_fitx, ploty, color='yellow')
+        ax2.plot(right_fitx, ploty, color='yellow')
+        ax2.set_title('Line with position polynomial', fontsize=20)
+
+        ax4.plot(histogram)
+        ax4.set_title('Histogram',fontsize=20)
+
+        ax3.imshow(result)
+        ax3.set_title('Original (undistorted) image with lane area drawn', fontsize=15)
+        plt.show()
