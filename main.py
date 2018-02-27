@@ -636,7 +636,7 @@ def process_image(img):
     #print(left_fit.size)
     #print(left_fitx_mean.size)
     left_fitx_mean = left_fitx*0.3 + left_fitx_mean*0.7
-    right_fitx_mean = right_fitx*0.5 + right_fitx_mean*0.5
+    right_fitx_mean = right_fitx*0.3 + right_fitx_mean*0.7
 
     left_fitx = left_fitx_mean
     right_fitx = right_fitx_mean
