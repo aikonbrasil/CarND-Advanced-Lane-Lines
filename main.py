@@ -632,11 +632,11 @@ def process_image(img):
     ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
     left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
     right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
-    print(type(left_fitx))
-    print(left_fit.size)
-    print(left_fitx_mean.size)
-    left_fitx_mean = left_fitx*0.1 + left_fitx_mean*0.9
-    right_fitx_mean = right_fitx*0.1 + right_fitx_mean*0.9
+    #print(type(left_fitx))
+    #print(left_fit.size)
+    #print(left_fitx_mean.size)
+    left_fitx_mean = left_fitx*0.3 + left_fitx_mean*0.7
+    right_fitx_mean = right_fitx*0.5 + right_fitx_mean*0.5
 
     left_fitx = left_fitx_mean
     right_fitx = right_fitx_mean
@@ -669,6 +669,7 @@ if True:
     right_fitx_mean = np.zeros(720)
     video_output = 'outputvideo.mp4'
     clip1 = VideoFileClip("project_video.mp4")
-    white_clip = clip1.fl_image(process_image).subclip(23,25)
+    #white_clip = clip1.fl_image(process_image).subclip(23,25)
+    white_clip = clip1.fl_image(process_image)
     white_clip.write_videofile(video_output, audio=False)
     print('finished')
