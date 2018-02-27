@@ -3,6 +3,9 @@ import cv2
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import glob
+# Import everything needed to edit/save/watch video clips
+from moviepy.editor import VideoFileClip
+from IPython.display import HTML
 
 ###############################################################################
 def cal_undistort(img, objpoints, imgpoints):
@@ -426,3 +429,19 @@ for frame in images:
         ax3.imshow(result)
         ax3.set_title('Original (undistorted) image with lane area drawn', fontsize=15)
         plt.show()
+
+
+################################################################################
+# Video
+################################################################################
+def process_image(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    return gray
+
+
+
+video_output = 'outputvideo.mp4'
+clip1 = VideoFileClip("project_video.mp4")
+white_clip = clip1.fl_image(process_image)
+white_clip.write_videofile(video_output, audio=False)
+print('finished')
