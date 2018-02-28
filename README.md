@@ -130,30 +130,37 @@ Since the line code number 234 until 534 in `main.py` file, I implemented functi
 .
 .
 .
+
 ![alt text][image2_lane_line]
 .
 .
 .
+
 ![alt text][image3_lane_line]
 .
 .
 .
+
 ![alt text][image4_lane_line]
 .
 .
 .
+
 ![alt text][image5_lane_line]
 .
 .
 .
+
 ![alt text][image6_lane_line]
 .
 .
 .
+
 ![alt text][image7_lane_line]
 .
 .
 .
+
 ![alt text][image8_lane_line]
 
 ---
