@@ -16,6 +16,7 @@ global left_lane_inds
 global right_lane_inds
 global left_fitx_mean
 global right_fitx_mean
+global global_threshold
 globalCounter = 0
 
 ###############################################################################
@@ -276,9 +277,23 @@ def list_of_peaks(hist, maxrange,flag):
     #print(index_of_highest_peak)
     return index_of_highest_peak
 
+def histogram_analise(binary_warped):
+    # Take a histogram of the bottom half of the image
+    histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
+    suma_center_hist = np.sum(histogram[600:800])
+    print(suma_center_hist)
+    #if suma_center_hist > 197:
+    if suma_center_hist > 1000:
+        threshold = 200
+    else:
+        threshold = 100
+    return threshold
+
+
 def findng_lines_slidingwindow(binary_warped):
     global left_lane_inds
     global right_lane_inds
+    global global_threshold
     # Take a histogram of the bottom half of the image
     histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
     # Create an output image to draw on and  visualize the result
@@ -517,9 +532,9 @@ def findng_lines_targeted(binary_warped,left_fit, right_fit):
 
     return left_lane_inds, right_lane_inds, left_fit, right_fit, nonzeroy, nonzerox, left_curverad, right_curverad
 
-images = []
+#images = []
 #images = glob.glob('test_images/*.jpg')
-#images = glob.glob('evaluation_images/*.jpg')
+images = glob.glob('evaluation_images/*.jpg')
 #images = glob.glob('test_images/test5.jpg')
 for frame in images:
     print(frame)
@@ -534,10 +549,19 @@ for frame in images:
 
     #image = mpimg.imread('test_images/test1.jpg')
     # Applying Threshold
+
     result_mixcolor, result_binary  = pipeline(image, s_thresh=(100, 255), sx_thresh=(20, 100), d_thresh = (0.7, 1.3), mag_thresh=(58,110))
 
     #binary_warped, perspective_M = corners_unwarp(result_binary, objpoints, imgpoints, src, dst)
     binary_warped, perspective_M = corners_unwarp(result_binary, objpoints, imgpoints, src, dst)
+
+    variable_threshold = histogram_analise(binary_warped)
+    print("VARIABLE THRESHOLD")
+    print(variable_threshold)
+    if variable_threshold == 200:
+        print("entrou !")
+        result_mixcolor, result_binary  = pipeline(image, s_thresh=(200, 255), sx_thresh=(20, 100), d_thresh = (0.7, 1.3), mag_thresh=(58,110))
+        binary_warped, perspective_M = corners_unwarp(result_binary, objpoints, imgpoints, src, dst)
 
     left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox, histogram= findng_lines_slidingwindow(binary_warped)
 
@@ -569,7 +593,7 @@ for frame in images:
 
     # ***********visualization
     # Generate x and y values for plotting
-    flag_plot = False
+    flag_plot = True
     if flag_plot == True:
         out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
         out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
@@ -616,8 +640,18 @@ def process_image(img):
     #image = mpimg.imread('test_images/test1.jpg')
     # Applying Threshold
     result_mixcolor, result_binary  = pipeline(image, s_thresh=(100, 255), sx_thresh=(20, 100), d_thresh = (0.75, 1.3), mag_thresh=(58,110))
-    print(globalCounter)
     binary_warped, perspective_M = corners_unwarp(result_binary, objpoints, imgpoints, src, dst)
+
+
+    variable_threshold = histogram_analise(binary_warped)
+    #print("VARIABLE THRESHOLD")
+    #print(variable_threshold)
+    if variable_threshold == 200:
+        #print("entrou !")
+        result_mixcolor, result_binary  = pipeline(image, s_thresh=(200, 255), sx_thresh=(20, 100), d_thresh = (0.7, 1.3), mag_thresh=(58,110))
+        binary_warped, perspective_M = corners_unwarp(result_binary, objpoints, imgpoints, src, dst)
+
+    print(globalCounter)
     if globalCounter < 2:
         left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox, histogram= findng_lines_slidingwindow(binary_warped)
         print("Using WINDOWING VERSION of FINDING LINES")
@@ -626,6 +660,11 @@ def process_image(img):
         print("Using OPTIMIZED VERSION of FINDING LINES")
         if fabs(left_curverad-right_curverad) > 500:
             globalCounter = 0
+
+
+
+
+
     globalCounter += 1
 
     # Calculations of polynoms points
@@ -636,7 +675,7 @@ def process_image(img):
     #print(left_fit.size)
     #print(left_fitx_mean.size)
     left_fitx_mean = left_fitx*0.3 + left_fitx_mean*0.7
-    right_fitx_mean = right_fitx*0.3 + right_fitx_mean*0.7
+    right_fitx_mean = right_fitx*0.1 + right_fitx_mean*0.9
 
     left_fitx = left_fitx_mean
     right_fitx = right_fitx_mean
@@ -663,13 +702,13 @@ def process_image(img):
     result = cv2.addWeighted(undist, 1, newwarp, 0.3, 0)
     return result
 
-if True:
+if False:
     globalCounter = 0
     left_fitx_mean = np.zeros(720)
     right_fitx_mean = np.zeros(720)
     video_output = 'outputvideo.mp4'
     clip1 = VideoFileClip("project_video.mp4")
     #white_clip = clip1.fl_image(process_image).subclip(23,25)
-    white_clip = clip1.fl_image(process_image)
+    white_clip = clip1.fl_image(process_image).subclip(21,23)
     white_clip.write_videofile(video_output, audio=False)
     print('finished')
