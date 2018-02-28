@@ -128,17 +128,31 @@ Since the line code number 234 until 534 in `main.py` file, I implemented functi
 
 ![alt text][image1_lane_line]
 .
+.
+.
 ![alt text][image2_lane_line]
+.
+.
 .
 ![alt text][image3_lane_line]
 .
+.
+.
 ![alt text][image4_lane_line]
+.
+.
 .
 ![alt text][image5_lane_line]
 .
+.
+.
 ![alt text][image6_lane_line]
 .
+.
+.
 ![alt text][image7_lane_line]
+.
+.
 .
 ![alt text][image8_lane_line]
 
@@ -150,9 +164,9 @@ Since the line code number 234 until 534 in `main.py` file, I implemented functi
 
 I generated the output video requested in this project. I added the text with radius and offset distance of the car to the center. If you check, It is possible to check the lines detected in red color for left lines and blue color for the right lines. The Radius is extrapolated when the car is in zones without curves. In curve zones, the radius is approximately 1000m.
 
-Here's a [link to my video result](./outputvideo.mp4)
+Here's a [link to my video saved in Youtube](https://youtu.be/9C8vRQcIHxo)
+It could be also acceced in the repository, it was saved with the name `outputvideo.mp4`
 
-![alt text][video1]
 
 ---
 
