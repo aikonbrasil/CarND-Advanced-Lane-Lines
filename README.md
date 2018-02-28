@@ -29,12 +29,15 @@ The goals / steps of this project are the following:
 [image5_warped]: ./output_images/wraped_4.png "Warped 5"
 [image6_warped]: ./output_images/wraped_5.png "Warped 6"
 [image7_warped]: ./output_images/wraped_6.png "Warped 7"
-[image2]: ./test_images/test1.jpg "Road Transformed"
-[image3]: ./examples/binary_combo_example.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
+[image1_lane_line]: ./output_images/lane_line_pixels_1.png "Lane line Example 1"
+[image2_lane_line]: ./output_images/lane_line_pixels_2.png "Lane line Example 2"
+[image3_lane_line]: ./output_images/lane_line_pixels_3.png "Lane line Example 3"
+[image4_lane_line]: ./output_images/lane_line_pixels_4.png "Lane line Example 4"
+[image5_lane_line]: ./output_images/lane_line_pixels_5.png "Lane line Example 5"
+[image6_lane_line]: ./output_images/lane_line_pixels_6.png "Lane line Example 6"
+[image7_lane_line]: ./output_images/lane_line_pixels_7.png "Lane line Example 7"
+[image8_lane_line]: ./output_images/lane_line_pixels_8.png "Lane line Example 8"
+[video1]: ./outputvideo.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
@@ -106,20 +109,59 @@ I verified that my perspective transform was working as expected by drawing the 
 ![alt text][image7_warped]
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+Since the line 293 begins the code of `findng_lines_slidingwindow()` function. In this function we calculate the histogram in axis=0 (X) and calculated the main peak of the first half of the first 640 pixels in axis x and the main peak of the second half of histogram. After an analysis we observed that the Peaks that are interested for this project are that peaks that are near the center in both cases. So, I decided to restring the localization of these peaks between 400 and 1060 pixels (check line 304 and 305 of main.py file). After defined the peaks, we define initial point to search pixels in left and right side. To perform pixels search, I used the Udacity code, in this code is defined a window with margin and minpix parameters which are used to define the size of the window and the criteria to look for a new direction, respectively. Other parameters is the number of windows to use in vertical direction. Every window check the pixels that are inside it, the search is performed vertically, defining a line based on the pixels that were localized. These informations are concatenated in numpy array called `left_lane_inds` for left line and `right_lane_inds` for right line.  Based on these information the code uses the `polyfit` function to define the parameters of the 2nd order curve defined by A, B, and C in the polynomial equation: `(f(y)=A y**2 + B y + C)`.
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+As suggested by Udacity I generated other function called `finding_lines_targeted()` (since line 402 in main.py file), in which I take advantage of the information of the windowing solution to find lines without apply any histogram, just using the previous information to localize lines (an optimized search of lines).
 
+Described images were shared in section 6.
 ![alt text][image5]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+ As complement the radius were calculated using the relation defined by `L_curve =  = ((1 + (2*A*y+ B)**2)**1.5) / abs(2*A)`. It was useful extracting values of vectors: `left_fit` and `right_fit` with its respective value in meters. Vectors mentioned before contain A, B, and C parameters. It could be checked in the line 392 of the file `main.py`
 
-I did this in lines # through # in my code in `my_other_file.py`
+ The localization of the vehicle with respect to center was done using code lines 618 until 623 of `main.py` file. For this pourpose we calculated the mean values of indexes of `left_lane_inds` and `right_lane_inds` vectors, everyone representing the position of left and right lines. This positions were summed and divided by 2 in order to obtain the center calculated based on line find technique. The previous value was compared with the center of the image that is equal to 640, The difference between both values described before represents the offset in pixels. Finally I applied the conversions to meters using the rate 3.7/700.
+
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+Since the line code number 234 until 534 in `main.py` file, I implemented functions that helped to get lane finding algorithm. Here I defined the next functions: `list_of_peaks()`, `histogram_analise`, `findng_lines_slidingwindow()`, `findng_lines_targeted`. Here is an example of my result on a test image:
 
-![alt text][image6]
+![alt text][image1_lane_line]
+.
+.
+.
+
+![alt text][image2_lane_line]
+.
+.
+.
+
+![alt text][image3_lane_line]
+.
+.
+.
+
+![alt text][image4_lane_line]
+.
+.
+.
+
+![alt text][image5_lane_line]
+.
+.
+.
+
+![alt text][image6_lane_line]
+.
+.
+.
+
+![alt text][image7_lane_line]
+.
+.
+.
+
+![alt text][image8_lane_line]
 
 ---
 
@@ -127,7 +169,11 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+I generated the output video requested in this project. I added the text with radius and offset distance of the car to the center. If you check, It is possible to check the lines detected in red color for left lines and blue color for the right lines. The Radius is extrapolated when the car is in zones without curves. In curve zones, the radius is approximately 1000m.
+
+Here's a [link to my video saved in Youtube](https://youtu.be/9C8vRQcIHxo)
+It could be also acceced in the repository, it was saved with the name `outputvideo.mp4`
+
 
 ---
 
@@ -135,4 +181,4 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+I have inserted some global variables to perform some adaptative configuration parameters in threshold algorithm code. I mean, in specific scenarios these values changed based on distribution of pixels in the histogram. It is possible that my solution might fail in night conditions.
