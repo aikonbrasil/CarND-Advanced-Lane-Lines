@@ -127,19 +127,19 @@ Described images were shared in section 6.
 Since the line code number 234 until 534 in `main.py` file, I implemented functions that helped to get lane finding algorithm. Here I defined the next functions: `list_of_peaks()`, `histogram_analise`, `findng_lines_slidingwindow()`, `findng_lines_targeted`. Here is an example of my result on a test image:
 
 ![alt text][image1_lane_line]
-
+.
 ![alt text][image2_lane_line]
-
+.
 ![alt text][image3_lane_line]
-
+.
 ![alt text][image4_lane_line]
-
+.
 ![alt text][image5_lane_line]
-
+.
 ![alt text][image6_lane_line]
-
+.
 ![alt text][image7_lane_line]
-
+.
 ![alt text][image8_lane_line]
 
 ---
