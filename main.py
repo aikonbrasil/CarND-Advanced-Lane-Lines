@@ -281,9 +281,9 @@ def histogram_analise(binary_warped):
     # Take a histogram of the bottom half of the image
     histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
     suma_center_hist = np.sum(histogram[600:800])
-    print(suma_center_hist)
+    #print(suma_center_hist)
     #if suma_center_hist > 197:
-    if suma_center_hist > 1000:
+    if suma_center_hist > 1100:
         threshold = 200
     else:
         threshold = 100
@@ -303,7 +303,7 @@ def findng_lines_slidingwindow(binary_warped):
     midpoint = np.int(histogram.shape[0]/2)
     leftx_base = np.argmax(histogram[400:midpoint])+400
     rightx_base = np.argmax(histogram[midpoint:1060]) + midpoint
-
+    #print(midpoint)
     #print('Pico raw izquerda')
     #print(leftx_base)
     #print("ENTRO PARA CALCULAR PICO")
@@ -394,10 +394,10 @@ def findng_lines_slidingwindow(binary_warped):
     left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
     right_curverad = ((1 + (2*right_fit_cr[0]*y_evall*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
     # Now our radius of curvature is in meters
-    print('Left_line_curvature = ',left_curverad, 'm','   Right_line_curvature = ', right_curverad, 'm')
+    #print('Left_line_curvature = ',left_curverad, 'm','   Right_line_curvature = ', right_curverad, 'm')
 
 
-    return left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox, histogram
+    return left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox, histogram, left_curverad, right_curverad
 
 def findng_lines_targeted(binary_warped,left_fit, right_fit):
     # # Take a histogram of the bottom half of the image
@@ -527,14 +527,14 @@ def findng_lines_targeted(binary_warped,left_fit, right_fit):
     left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
     right_curverad = ((1 + (2*right_fit_cr[0]*y_evall*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
     # Now our radius of curvature is in meters
-    print('Left_line_curvature = ',left_curverad, 'm','   Right_line_curvature = ', right_curverad, 'm')
+    #print('Left_line_curvature = ',left_curverad, 'm','   Right_line_curvature = ', right_curverad, 'm')
 
 
-    return left_lane_inds, right_lane_inds, left_fit, right_fit, nonzeroy, nonzerox, left_curverad, right_curverad
+    return left_lane_inds, right_lane_inds, left_fit, right_fit, nonzeroy, nonzerox, left_curverad, right_curverad, left_curverad, right_curverad
 
-#images = []
+images = []
 #images = glob.glob('test_images/*.jpg')
-images = glob.glob('evaluation_images/*.jpg')
+#images = glob.glob('evaluation_images/*.jpg')
 #images = glob.glob('test_images/test5.jpg')
 for frame in images:
     print(frame)
@@ -620,6 +620,21 @@ for frame in images:
         ax3.set_title('Original (undistorted) image with lane area drawn', fontsize=15)
         plt.show()
 
+def addingText(img,text1, text2):
+
+    font                   = cv2.FONT_HERSHEY_SIMPLEX
+    bottomLeftCornerOfText1 = (10,50)
+    bottomLeftCornerOfText2 = (10,100)
+    fontScale              = 1
+    fontColor              = (255,255,255)
+    lineType               = 2
+
+    cv2.putText(img,'Radius of Curvature = '+text1+'(m)',bottomLeftCornerOfText1,font,fontScale,fontColor,lineType)
+    cv2.putText(img,'Vehicle is '+text2+'m left of center',bottomLeftCornerOfText2,font,fontScale,fontColor,lineType)
+    cv2.putText(img,'Advanced Lane Finding',(10,130),font,0.6,fontColor,lineType)
+    cv2.putText(img,'Author: Dick Carrillo Melgarejo',(10,160),font,0.6,fontColor,lineType)
+
+    return img
 
 ################################################################################
 # Video
@@ -651,19 +666,15 @@ def process_image(img):
         result_mixcolor, result_binary  = pipeline(image, s_thresh=(200, 255), sx_thresh=(20, 100), d_thresh = (0.7, 1.3), mag_thresh=(58,110))
         binary_warped, perspective_M = corners_unwarp(result_binary, objpoints, imgpoints, src, dst)
 
-    print(globalCounter)
+    #print(globalCounter)
     if globalCounter < 2:
-        left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox, histogram= findng_lines_slidingwindow(binary_warped)
-        print("Using WINDOWING VERSION of FINDING LINES")
+        left_lane_inds, right_lane_inds, left_fit, right_fit, out_img, nonzeroy, nonzerox, histogram, left_curverad, right_curverad= findng_lines_slidingwindow(binary_warped)
+        #print("Using WINDOWING VERSION of FINDING LINES")
     else:
-        left_lane_inds, right_lane_inds, left_fit, right_fit, nonzeroy, nonzerox, left_curverad, right_curverad = findng_lines_targeted(binary_warped,left_fit, right_fit)
-        print("Using OPTIMIZED VERSION of FINDING LINES")
+        left_lane_inds, right_lane_inds, left_fit, right_fit, nonzeroy, nonzerox, left_curverad, right_curverad, left_curverad, right_curverad = findng_lines_targeted(binary_warped,left_fit, right_fit)
+        #print("Using OPTIMIZED VERSION of FINDING LINES")
         if fabs(left_curverad-right_curverad) > 500:
             globalCounter = 0
-
-
-
-
 
     globalCounter += 1
 
@@ -684,8 +695,24 @@ def process_image(img):
     # Preparing and format for undistort with detected green region
     warped = binary_warped
         # Create an image to draw the lines on
-    warp_zero = np.zeros_like(warped).astype(np.uint8)
-    color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
+    #out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
+    #out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
+    warp_zero_r = np.zeros_like(warped).astype(np.uint8)
+    warp_zero_g = np.zeros_like(warped).astype(np.uint8)
+    warp_zero_b = np.zeros_like(warped).astype(np.uint8)
+    warp_zero_r[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = 255
+
+    # calculating offset of the car respect the center line.
+    distancia_emPixels_l = np.mean(nonzerox[left_lane_inds])
+    distancia_emPixels_r = np.mean(nonzerox[right_lane_inds])
+    pto_medio_medido = distancia_emPixels_r/2+distancia_emPixels_l/2
+    offset_pixels = fabs(pto_medio_medido-640)
+    offset_meters = offset_pixels*3.7/700
+    #print(offset_pixels)
+    #print(offset_pixels*3.7/700)
+
+    warp_zero_b[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = 255
+    color_warp = np.dstack((warp_zero_r, warp_zero_g, warp_zero_b))
 
     # Recast the x and y points into usable format for cv2.fillPoly()
     pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
@@ -700,15 +727,20 @@ def process_image(img):
     # Combine the result with the original image
     undist = image
     result = cv2.addWeighted(undist, 1, newwarp, 0.3, 0)
+    curvature = left_curverad/2+right_curverad/2
+    string1 = "%0.1f" %curvature
+    string2 = "%0.1f" %offset_meters
+    result = addingText(result,string1, string2)
+
     return result
 
-if False:
+if True:
     globalCounter = 0
-    left_fitx_mean = np.zeros(720)
-    right_fitx_mean = np.zeros(720)
+    left_fitx_mean = np.ones(720)*400
+    right_fitx_mean = np.ones(720)*800
     video_output = 'outputvideo.mp4'
     clip1 = VideoFileClip("project_video.mp4")
     #white_clip = clip1.fl_image(process_image).subclip(23,25)
-    white_clip = clip1.fl_image(process_image).subclip(21,23)
+    white_clip = clip1.fl_image(process_image)
     white_clip.write_videofile(video_output, audio=False)
     print('finished')
