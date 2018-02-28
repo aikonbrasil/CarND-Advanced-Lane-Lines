@@ -113,7 +113,7 @@ Since the line 293 begins the code of `findng_lines_slidingwindow()` function. I
 
 As suggested by Udacity I generated other function called `finding_lines_targeted()` (since line 402 in main.py file), in which I take advantage of the information of the windowing solution to find lines without apply any histogram, just using the previous information to localize lines (an optimized search of lines).
 
-
+Described images were shared in section 6.
 ![alt text][image5]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
@@ -127,12 +127,19 @@ As suggested by Udacity I generated other function called `finding_lines_targete
 Since the line code number 234 until 534 in `main.py` file, I implemented functions that helped to get lane finding algorithm. Here I defined the next functions: `list_of_peaks()`, `histogram_analise`, `findng_lines_slidingwindow()`, `findng_lines_targeted`. Here is an example of my result on a test image:
 
 ![alt text][image1_lane_line]
+
 ![alt text][image2_lane_line]
+
 ![alt text][image3_lane_line]
+
 ![alt text][image4_lane_line]
+
 ![alt text][image5_lane_line]
+
 ![alt text][image6_lane_line]
+
 ![alt text][image7_lane_line]
+
 ![alt text][image8_lane_line]
 
 ---
@@ -143,7 +150,9 @@ Since the line code number 234 until 534 in `main.py` file, I implemented functi
 
 I generated the output video requested in this project. I added the text with radius and offset distance of the car to the center. If you check, It is possible to check the lines detected in red color for left lines and blue color for the right lines. The Radius is extrapolated when the car is in zones without curves. In curve zones, the radius is approximately 1000m.
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./outputvideo.mp4)
+
+![alt text][video1]
 
 ---
 

@@ -445,8 +445,8 @@ def findng_lines_targeted(binary_warped,left_fit, right_fit):
 
     return left_lane_inds, right_lane_inds, left_fit, right_fit, nonzeroy, nonzerox, left_curverad, right_curverad
 
-#images = []
-images = glob.glob('test_images/*.jpg')
+images = []
+#images = glob.glob('test_images/*.jpg')
 #images = glob.glob('evaluation_images/*.jpg')
 #images = glob.glob('test_images/test5.jpg')
 for frame in images:
@@ -647,7 +647,7 @@ def process_image(img):
 
     return result
 
-if False:
+if True: # To Generate the Video should be True
     globalCounter = 0
     left_fitx_mean = np.ones(720)*400
     right_fitx_mean = np.ones(720)*800
